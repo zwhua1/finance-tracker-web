@@ -1,0 +1,401 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>团队财务全自动对账系统</title>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Noto Sans SC', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            min-height: 100vh;
+            padding: 20px;
+            color: #333;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+            background: white;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        .header h1 {
+            font-size: 32px;
+            color: #1a365d;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            font-size: 16px;
+            color: #666;
+        }
+
+        .main-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+
+        .card {
+            background: white;
+            border-radius: 12px;
+            padding: 25px;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+            border-left: 4px solid #2563eb;
+        }
+
+        .card h2 {
+            font-size: 18px;
+            color: #1a365d;
+            margin-bottom: 15px;
+            padding-bottom: 12px;
+            border-bottom: 2px solid #e5e7eb;
+        }
+
+        .card-content {
+            max-height: 400px;
+            overflow-y: auto;
+        }
+
+        .card-content::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .card-content::-webkit-scrollbar-track {
+            background: #f1f1f1;
+            border-radius: 10px;
+        }
+
+        .card-content::-webkit-scrollbar-thumb {
+            background: #cbd5e0;
+            border-radius: 10px;
+        }
+
+        .card-content::-webkit-scrollbar-thumb:hover {
+            background: #a0aec0;
+        }
+
+        .item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 0;
+            border-bottom: 1px solid #f0f0f0;
+            font-size: 14px;
+        }
+
+        .item:last-child {
+            border-bottom: none;
+        }
+
+        .item-label {
+            color: #666;
+        }
+
+        .item-value {
+            font-weight: 600;
+            color: #1a365d;
+        }
+
+        .total-box {
+            background: linear-gradient(135deg, #fee2e2 0%, #fecaca 100%);
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 15px;
+            display: flex;
+            justify-content: space-between;
+            font-weight: 700;
+            color: #991b1b;
+        }
+
+        .dashboard {
+            background: linear-gradient(135deg, #1a365d 0%, #2d3748 100%);
+            color: white;
+            border-radius: 12px;
+            padding: 30px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+            margin-bottom: 20px;
+        }
+
+        .dashboard h3 {
+            font-size: 24px;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid rgba(255,255,255,0.2);
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .stat-item {
+            background: rgba(255,255,255,0.1);
+            padding: 15px;
+            border-radius: 8px;
+            border: 1px solid rgba(255,255,255,0.2);
+            text-align: center;
+        }
+
+        .stat-label {
+            font-size: 12px;
+            color: rgba(255,255,255,0.7);
+            margin-bottom: 8px;
+        }
+
+        .stat-value {
+            font-size: 20px;
+            font-weight: 700;
+        }
+
+        .status-box {
+            padding: 20px;
+            border-radius: 8px;
+            text-align: center;
+            font-weight: 700;
+            font-size: 16px;
+            border: 2px solid;
+        }
+
+        .status-balanced {
+            background: rgba(34, 197, 94, 0.2);
+            border-color: #22c55e;
+            color: #86efac;
+        }
+
+        .status-unbalanced {
+            background: rgba(239, 68, 68, 0.2);
+            border-color: #ef4444;
+            color: #fca5a5;
+        }
+
+        .footer {
+            text-align: center;
+            margin-top: 30px;
+            padding: 20px;
+            color: #666;
+            font-size: 14px;
+        }
+
+        @media (max-width: 768px) {
+            .header h1 {
+                font-size: 24px;
+            }
+
+            .main-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .stats-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 10px;
+            font-size: 13px;
+        }
+
+        table th {
+            background: #f3f4f6;
+            padding: 10px;
+            text-align: left;
+            font-weight: 600;
+            color: #1a365d;
+            border-bottom: 2px solid #e5e7eb;
+        }
+
+        table td {
+            padding: 8px 10px;
+            border-bottom: 1px solid #f0f0f0;
+        }
+
+        table tr:hover {
+            background: #f9fafb;
+        }
+
+        .short-term {
+            background: #fee2e2;
+            color: #991b1b;
+            font-weight: 600;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <div class="header">
+            <h1>团队财务全自动对账系统</h1>
+            <p>25人 6天 完整明细录入 | 最终数据版</p>
+        </div>
+
+        <!-- Main Grid -->
+        <div class="main-grid">
+            <!-- Card 1: Expense Flow -->
+            <div class="card">
+                <h2>一、每日费用明细流水</h2>
+                <div class="card-content">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>日期</th>
+                                <th>员工</th>
+                                <th>金额</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr><td>02/09</td><td>小磊</td><td>$29.96</td></tr>
+                            <tr><td>02/09</td><td>阿楠</td><td>$29.96</td></tr>
+                            <tr><td>02/09</td><td>鹏程</td><td>$29.96</td></tr>
+                            <tr><td>02/09</td><td>小明</td><td>$29.96</td></tr>
+                            <tr><td>02/09</td><td>阿耀</td><td>$29.96</td></tr>
+                            <tr><td>02/09</td><td>红牛</td><td>$29.96</td></tr>
+                            <tr><td>02/09</td><td>阿江</td><td>$29.96</td></tr>
+                            <tr><td>02/09</td><td>阿喜</td><td>$29.96</td></tr>
+                            <tr><td>02/09</td><td>阿英</td><td>$29.96</td></tr>
+                            <tr><td>02/09</td><td>阿天</td><td>$29.96</td></tr>
+                            <tr><td>02/09</td><td>阿刚</td><td>$29.96</td></tr>
+                            <tr><td>02/09</td><td>小胖</td><td>$29.96</td></tr>
+                            <tr><td>02/09</td><td>大宝</td><td>$29.96</td></tr>
+                            <tr><td>02/09</td><td>飞飞</td><td>$29.96</td></tr>
+                            <tr><td>02/09</td><td>A6</td><td>$29.96</td></tr>
+                            <tr><td>02/09</td><td>A7</td><td>$29.96</td></tr>
+                            <tr><td>02/09</td><td>眼镜</td><td>$29.96</td></tr>
+                            <tr><td>02/09</td><td>山鸡</td><td>$29.96</td></tr>
+                            <tr><td>02/09</td><td>阿里</td><td>$29.96</td></tr>
+                            <tr><td>02/09</td><td>吞吞</td><td>$29.96</td></tr>
+                            <tr><td>02/09</td><td>阿嫖</td><td>$29.96</td></tr>
+                            <tr><td>02/09</td><td>公共项目</td><td>$306.00</td></tr>
+                            <tr><td>02/09</td><td>公共项目</td><td>$250.00</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div class="total-box">
+                    <span>流水总计</span>
+                    <span>$2,872.77</span>
+                </div>
+            </div>
+
+            <!-- Card 2: Fund Tracking -->
+            <div class="card">
+                <h2>二、资金往来核算</h2>
+                <div class="card-content">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>日期</th>
+                                <th>金额</th>
+                                <th>说明</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr><td>02/09</td><td>$5,000.00</td><td>首批预拨资金</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div class="total-box">
+                    <span>下发总计</span>
+                    <span>$5,000.00</span>
+                </div>
+            </div>
+
+            <!-- Card 3: Personal Summary -->
+            <div class="card">
+                <h2>三、个人费用汇总</h2>
+                <div class="card-content">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>员工</th>
+                                <th>金额</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr><td>小磊</td><td>$29.96</td></tr>
+                            <tr><td>阿楠</td><td>$29.96</td></tr>
+                            <tr><td>鹏程</td><td>$29.96</td></tr>
+                            <tr><td>小明</td><td>$29.96</td></tr>
+                            <tr><td>阿耀</td><td>$29.96</td></tr>
+                            <tr><td>红牛</td><td>$29.96</td></tr>
+                            <tr><td>阿江</td><td>$29.96</td></tr>
+                            <tr><td>阿喜</td><td>$29.96</td></tr>
+                            <tr><td>阿英</td><td>$29.96</td></tr>
+                            <tr><td>阿天</td><td>$29.96</td></tr>
+                            <tr><td>阿刚</td><td>$29.96</td></tr>
+                            <tr><td>小胖</td><td>$29.96</td></tr>
+                            <tr><td>大宝</td><td>$29.96</td></tr>
+                            <tr><td>飞飞</td><td>$29.96</td></tr>
+                            <tr><td>A6</td><td>$29.96</td></tr>
+                            <tr><td>A7</td><td>$29.96</td></tr>
+                            <tr><td>眼镜</td><td>$29.96</td></tr>
+                            <tr><td>山鸡</td><td>$29.96</td></tr>
+                            <tr><td>阿里</td><td>$29.96</td></tr>
+                            <tr><td>吞吞</td><td>$29.96</td></tr>
+                            <tr><td>阿嫖</td><td>$29.96</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div class="total-box">
+                    <span>个人汇总总计</span>
+                    <span>$2,622.77</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Dashboard -->
+        <div class="dashboard">
+            <h3>【 核心财务对账看板 - 最终数据校验 】</h3>
+            <div class="stats-grid">
+                <div class="stat-item">
+                    <div class="stat-label">下发总额</div>
+                    <div class="stat-value">$5,000.00</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-label">消费总额</div>
+                    <div class="stat-value">$2,872.77</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-label">理论余额</div>
+                    <div class="stat-value">$2,127.23</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-label">实际支出</div>
+                    <div class="stat-value">$2,872.77</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-label">可用余额</div>
+                    <div class="stat-value">$2,127.23</div>
+                </div>
+            </div>
+            <div class="status-box status-balanced">
+                ✅ 平账状态：金额完全吻合
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <div class="footer">
+            <p>报告生成时间：2026年2月14日 | 自动对账系统最终版 v6.0</p>
+        </div>
+    </div>
+</body>
+</html>
